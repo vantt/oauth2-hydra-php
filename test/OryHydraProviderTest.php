@@ -8,6 +8,7 @@ use Vantt\OAuth2\Client\Provider\OryHydraProvider;
 use League\OAuth2\Client\Tool\QueryBuilderTrait;
 use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use function GuzzleHttp\Psr7\build_query;
 
 class OryHydraProviderTest extends TestCase {
     use QueryBuilderTrait;
@@ -106,11 +107,65 @@ class OryHydraProviderTest extends TestCase {
         $this->assertFalse($provider->isPKCE());
     }
 
-    public function test_getAccessToken() {
+    public function test_getAccessToken__AuthorizationCode__JsonResponse() {
+        $token_data = [
+          'access_token'  => 'mock_access_token',
+          'scope'         => 'scope1,scope2,scope3',
+          'token_type'    => 'bearer',
+          'expires'       => time() + 3600,  // the moment which is expired
+          'refresh_token' => 'mock_refresh_token',
+        ];
+
+        $tokenResponse = m::mock(ResponseInterface::class);
+        $tokenResponse->shouldReceive('getBody')->andReturn(json_encode($token_data));
+        $tokenResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+        $tokenResponse->shouldReceive('getStatusCode')->andReturn(200);
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('send')->times(1)->andReturn($tokenResponse);
+        $this->provider->setHttpClient($client);
+
+        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        $this->assertEquals($token_data['access_token'], $token->getToken());
+        $this->assertEquals($token_data['expires'], $token->getExpires());
+        $this->assertEquals($token_data['refresh_token'], $token->getRefreshToken());
+        $this->assertNull($token->getResourceOwnerId());
+    }
+
+    public function test_getAccessToken__AuthorizationCode__XWWWFormResponse() {
         $data = [
-          'access_token' => uniqid(),
-          'scope'        => uniqid() . "," . uniqid(),
-          'token_type'   => 'bearer',
+          'access_token'  => 'mock_access_token',
+          'scope'         => 'scope1,scope2,scope3',
+          'token_type'    => 'bearer',
+          'expires'       => time() + 3600, // the moment which is expired
+          'refresh_token' => 'mock_refresh_token',
+        ];
+
+        $response = m::mock(ResponseInterface::class);
+        $response->shouldReceive('getBody')->andReturn(build_query($data));
+        $response->shouldReceive('getHeader')->andReturn(['content-type' => 'application/x-www-form-urlencoded']);
+        $response->shouldReceive('getStatusCode')->andReturn(200);
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('send')->times(1)->andReturn($response);
+        $this->provider->setHttpClient($client);
+
+        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        $this->assertEquals($data['access_token'], $token->getToken());
+        $this->assertEquals($data['expires'], $token->getExpires());
+        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertNull($token->getResourceOwnerId());
+    }
+
+    public function test_getAccessToken__refreshToken_JsonResponse() {
+        $data = [
+          'access_token'  => 'mock_access_token',
+          'scope'         => 'scope1,scope2,scope3',
+          'token_type'    => 'bearer',
+          'expires'       => time() + 3600, // the moment which is expired
+          'refresh_token' => 'mock_refresh_token',
         ];
 
         $response = m::mock(ResponseInterface::class);
@@ -122,46 +177,103 @@ class OryHydraProviderTest extends TestCase {
         $client->shouldReceive('send')->times(1)->andReturn($response);
         $this->provider->setHttpClient($client);
 
-        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $token = $this->provider->getAccessToken('refresh_token', ['refresh_token' => 'mock_refresh_token']);
 
         $this->assertEquals($data['access_token'], $token->getToken());
-        $this->assertNull($token->getExpires());
-        $this->assertNull($token->getRefreshToken());
+        $this->assertEquals($data['expires'], $token->getExpires());
+        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertNull($token->getResourceOwnerId());
+    }
+
+    public function test_getAccessToken__refreshToken_XWWWFormResponse() {
+        $data = [
+          'access_token'  => 'mock_access_token',
+          'scope'         => 'scope1,scope2,scope3',
+          'token_type'    => 'bearer',
+          'expires'       => time() + 3600, // the moment which is expired
+          'refresh_token' => 'mock_refresh_token',
+        ];
+
+        $response = m::mock(ResponseInterface::class);
+        $response->shouldReceive('getBody')->andReturn(build_query($data));
+        $response->shouldReceive('getHeader')->andReturn(['content-type' => 'application/x-www-form-urlencoded']);
+        $response->shouldReceive('getStatusCode')->andReturn(200);
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('send')->times(1)->andReturn($response);
+        $this->provider->setHttpClient($client);
+
+        $token = $this->provider->getAccessToken('refresh_token', ['refresh_token' => 'mock_refresh_token']);
+
+        $this->assertEquals($data['access_token'], $token->getToken());
+        $this->assertEquals($data['expires'], $token->getExpires());
+        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertNull($token->getResourceOwnerId());
+    }
+
+    public function test_getAccessToken_ClientCredentials() {
+        $token_data = [
+          'access_token'  => 'mock_access_token',
+          'scope'         => 'scope1,scope2,scope3',
+          'token_type'    => 'bearer',
+          'expires'       => time() + 3600, // the moment which is expired
+          'refresh_token' => 'mock_refresh_token',
+        ];
+
+        $tokenResponse = m::mock(ResponseInterface::class);
+        $tokenResponse->shouldReceive('getBody')->andReturn(json_encode($token_data));
+        $tokenResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+        $tokenResponse->shouldReceive('getStatusCode')->andReturn(200);
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('send')->times(1)->andReturn($tokenResponse);
+        $this->provider->setHttpClient($client);
+
+        $token = $this->provider->getAccessToken('client_credentials');
+
+        $this->assertEquals($token_data['access_token'], $token->getToken());
+        $this->assertEquals($token_data['expires'], $token->getExpires());
+        $this->assertEquals($token_data['refresh_token'], $token->getRefreshToken());
         $this->assertNull($token->getResourceOwnerId());
     }
 
     public function test_getResourceOwner() {
-        $data = [
-          'sub'   => uniqid(),
-          'name'  => uniqid(),
-          'email' => uniqid(),
-          'login' => uniqid(),
+        $token_data = [
+          'access_token'  => 'mock_access_token',
+          'scope'         => 'scope1,scope2,scope3',
+          'token_type'    => 'bearer',
+          'expires'       => time() + 3600, // the moment which is expired
+          'refresh_token' => 'mock_refresh_token',
         ];
 
-        $postResponse = m::mock(ResponseInterface::class);
-        $postResponse->shouldReceive('getBody')
-                     ->andReturn('access_token=mock_access_token&expires=3600&refresh_token=mock_refresh_token&otherKey={1234}');
-        $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'application/x-www-form-urlencoded']);
-        $postResponse->shouldReceive('getStatusCode')->andReturn(200);
+        $user_data = [
+          'sub'   => 'mock_sub',
+          'name'  => 'mock_name',
+          'email' => 'mock_email',
+          'login' => 'mock_login',
+        ];
+
+        $tokenResponse = m::mock(ResponseInterface::class);
+        $tokenResponse->shouldReceive('getBody')->andReturn(build_query($token_data));
+        $tokenResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'application/x-www-form-urlencoded']);
+        $tokenResponse->shouldReceive('getStatusCode')->andReturn(200);
 
         $userResponse = m::mock(ResponseInterface::class);
-        $userResponse->shouldReceive('getBody')->andReturn(json_encode($data));
+        $userResponse->shouldReceive('getBody')->andReturn(json_encode($user_data));
         $userResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
         $userResponse->shouldReceive('getStatusCode')->andReturn(200);
 
         $client = m::mock(ClientInterface::class);
-        $client->shouldReceive('send')
-               ->times(2)
-               ->andReturn($postResponse, $userResponse);
+        $client->shouldReceive('send')->times(2)->andReturn($tokenResponse, $userResponse);
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
         $user  = $this->provider->getResourceOwner($token);
 
-        $this->assertEquals($data, $user->toArray());
-        $this->assertEquals($data['sub'], $user->getId());
-        $this->assertEquals($data['name'], $user->getName());
-        $this->assertEquals($data['email'], $user->getEmail());
+        $this->assertEquals($user_data, $user->toArray());
+        $this->assertEquals($user_data['sub'], $user->getId());
+        $this->assertEquals($user_data['name'], $user->getName());
+        $this->assertEquals($user_data['email'], $user->getEmail());
 
         //        $this->assertEquals($nickname, $user->getNickname());
         //        $this->assertContains($nickname, $user->getUrl());
