@@ -1,0 +1,14 @@
+FROM php:7.4-cli-alpine
+
+RUN apk add --no-cache unzip chromium chromium-chromedriver
+
+ENV PANTHER_CHROME_DRIVER_BINARY=/usr/lib/chromium/chromedriver
+ENV PANTHER_NO_SANDBOX=1
+
+# Not mandatory, but recommended
+ENV PANTHER_CHROME_ARGUMENTS='--disable-dev-shm-usage'
+ENV PANTHER_CHROME_ARGUMENTS='--ignore-certificate-errors'
+#ENV PANTHER_EXTERNAL_BASE_URI='https://id.dev.mio'
+
+VOLUME ["/app"]
+WORKDIR /app
