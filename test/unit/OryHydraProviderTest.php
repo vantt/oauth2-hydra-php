@@ -1,6 +1,6 @@
 <?php
 
-namespace Vantt\OAuth2\Client\Test\Provider;
+namespace Vantt\OAuth2\Client\TestUnit\Provider;
 
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;

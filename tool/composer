@@ -49,4 +49,4 @@ composer2 () {
 }
 
 #source "$(dirname "$(realpath "$0")")"/rundocker
-composer "$@"
+composer2 "$@"

@@ -6,7 +6,7 @@
         {
             "name": "Tran Toan Van",
             "email": "trantoanvan@outlook.com",
-            "homepage": "https://github.com/vantt"
+            "homepage": "https://github.com/vantt/oauth2-hydra-php"
         }
     ],
     "keywords": [
@@ -33,7 +33,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Vantt\\OAuth2\\Client\\Test\\Provider\\": "test/"
+            "Vantt\\OAuth2\\Client\\TestUnit\\Provider\\": "test/unit/",
+            "Vantt\\OAuth2\\Client\\TestE2E\\Provider\\": "test/e2e/"
         }
     }
 }
