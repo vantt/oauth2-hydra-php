@@ -80,19 +80,25 @@ class OryHydraResourceOwnerTest extends TestCase {
         $this->assertEquals($mock_data['email'], $user->getEmail());
         $this->assertEquals($mock_data['email_verified'], $user->isEmailVerified());
         $this->assertEquals($mock_data['locale'], $user->getLocale());
+        $this->assertEquals($mock_data['zoneinfo'], $user->getZoneInfo());
         $this->assertEquals($mock_data['picture'], $user->getPicture());
 
     }
 
     public function testUserPartialData() {
-        $user = new OryHydraResourceOwner([
-                                            'sub'         => '12345',
-                                            'name'        => 'mock name',
-                                            'given_name'  => 'mock',
-                                            'family_name' => 'name',
-                                          ]
-        );
+        $mock_data = [
+          'sub'         => '12345',
+          'name'        => 'mock name',
+          'given_name'  => 'mock',
+          'family_name' => 'name',
+        ];
 
+        $user = new OryHydraResourceOwner($mock_data);
+
+        $this->assertEquals($mock_data['sub'], $user->getId());
+        $this->assertEquals($mock_data['name'], $user->getName());
+        $this->assertEquals($mock_data['given_name'], $user->getFirstName());
+        $this->assertEquals($mock_data['family_name'], $user->getLastName());
     }
 
     public function testUserMinimalData() {
