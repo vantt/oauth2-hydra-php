@@ -1,7 +1,7 @@
 describe('My First Test', () => {
     it('Does not do much!', () => {
         cy
-            .request('http://php:8000/test-connect/client-credentials')
+            .request('/test-connect/client-credentials')
             .then((response) => {
                 // response.body is automatically serialized into JSON
                 expect(response.body).to.have.property('scope') // true

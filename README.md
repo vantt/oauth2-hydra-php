@@ -14,5 +14,5 @@ or
 ```
 
 ### E2e Test
-
+docker-compose -f hydra-compose.yml -f php-compose.yml -f cypress-compose.yml  up --exit-code-from cypress
 docker-compose up --exit-code-from cypress
