@@ -6,5 +6,9 @@
 /phpunit.xml
 /build
 /.phpunit.result.cache
+
 /test/e2e/cypress/videos/
 /test/e2e/cypress/screenshots/
+.DS_Store
+node_modules
+vendor

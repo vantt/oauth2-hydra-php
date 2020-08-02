@@ -40,6 +40,9 @@ $app->get('/', function (Request $request, Response $response, $args) {
     return $response;
 });
 
+/**
+ * Test: Client Credentials
+ */
 $app->get('/test-connect/client-credentials', function (Request $request, Response $response, $args) {
     $provider = new OryHydraProvider([
                                        'baseUrl'      => 'http://hydra:4444',
