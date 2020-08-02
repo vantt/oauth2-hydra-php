@@ -19,14 +19,8 @@ volumes:
         driver_opts:
             type: none
             o: bind
-            device: $PWD/src
+            device: $PWD/../symf
 
-    testVolume:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: $PWD
 services:
     php_setup:
         image: "composer:2"
@@ -43,7 +37,7 @@ services:
         entrypoint: "/bin/sh -c "
         command: >
             " until nc -z -v -w5 hydra 4445; do sleep 5; done  \
-             && php -S 0.0.0.0:8000 -t /app
+             && php -S 0.0.0.0:8000 -t /app/public
             "
         depends_on:
             - consent

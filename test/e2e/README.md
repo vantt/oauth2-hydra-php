@@ -6,7 +6,7 @@ npm install cypress --save-dev
 yarn add cypress --dev
 ```
 
-## Run Quick Test
+## Run Quick Cypress Test
 
 ```
 cd test/e2e
@@ -32,7 +32,8 @@ $ export CYPRESS_BASE_URL=http://localhost:8000; $(npm bin)/cypress open
 ```
 
 
-## Cypress Folder Structure
+## Writing Tests with Cypress
+### Cypress Folder Structure
 ```
 # https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Folder-Structure
 
@@ -47,6 +48,7 @@ cypress
     |---- /config - environment configuration JSON files to extend/override the base cypress.json file - not all teams did this but it's another approach
 
 ```
+
 
 ## Cypress References
 - https://docs.cypress.io/guides/guides/command-line.html#How-to-run-commands
