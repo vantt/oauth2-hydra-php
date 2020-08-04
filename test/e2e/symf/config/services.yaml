@@ -4,9 +4,13 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    env(HYDRA_PUBLIC_HOST): 'http://localhost:4444'
-    env(HYDRA_HOST): 'http://localhost:4444'
-    env(PHP_HOST): 'http://localhost:8000'
+#    env(HYDRA_PUBLIC_HOST): 'http://localhost:4444'
+#    env(CONSENT_HOST): 'http://localhost:4444'
+#    env(PHP_HOST): 'http://localhost:8000'
+
+    hydra_public_host: '%env(string:HYDRA_PUBLIC_HOST)%'
+    consent_host: '%env(string:CONSENT_HOST)%'
+    php_host: '%env(string:PHP_HOST)%'
 
 services:
     # default configuration for services in *this* file

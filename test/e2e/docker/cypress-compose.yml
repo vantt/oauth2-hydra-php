@@ -28,7 +28,7 @@ services:
         image: "cypress/included:4.9.0"
         environment:
             # pass base url to test pointing at the web application
-            - CYPRESS_BASE_URL=http://${PHP_HOST}:8000
+            - CYPRESS_BASE_URL=${PHP_HOST}
         volumes:
             - testVolume:/app
             #- ./:/e2e

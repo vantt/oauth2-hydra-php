@@ -28,7 +28,7 @@ $ docker-compose -f hydra-compose.yml -f php-compose.yml up
 ```
 # server must expose port to host machine
 
-$ export CYPRESS_BASE_URL=http://localhost:8000; $(npm bin)/cypress open
+$ export CYPRESS_BASE_URL=http://10.254.254.254:8000; $(npm bin)/cypress open
 ```
 
 

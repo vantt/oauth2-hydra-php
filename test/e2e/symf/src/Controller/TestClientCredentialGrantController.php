@@ -23,7 +23,7 @@ class TestClientCredentialGrantController extends AbstractController {
         // it's not used in the OAuth 2.0 client credentials grant type.
 
         $provider = new OryHydraProvider([
-                                           'baseUrl'      => 'http://hydra:4444',
+                                           'baseUrl'      => $this->getParameter('hydra_public_host'),
                                            'clientId'     => 'user_client_credential',
                                            'clientSecret' => 'some-secret',
                                          ]

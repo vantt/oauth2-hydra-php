@@ -26,6 +26,8 @@ services:
         image: "composer:2"
         volumes:
             - appVolume:/app
+        env_file:
+          - ".env.${APP_ENV}"
         entrypoint: composer install
 
     php:
@@ -34,6 +36,8 @@ services:
             - "8000:8000" # Public port
         volumes:
             - appVolume:/app
+        env_file:
+            - ".env.${APP_ENV}"
         entrypoint: "/bin/sh -c "
         command: >
             " until nc -z -v -w5 hydra 4445; do sleep 5; done  \

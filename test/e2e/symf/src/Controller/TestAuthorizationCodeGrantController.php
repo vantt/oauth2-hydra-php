@@ -27,8 +27,8 @@ class TestAuthorizationCodeGrantController extends AbstractController {
         // the scopes you want to access
         $scopes   = ['photos.read', 'account.profile', 'openid', 'offline', 'offline_access'];
         $provider = new OryHydraProvider([
-                                           'baseUrl'      => $this->getParameter('HYDRA_PUBLIC_HOST'),
-                                           'clientId'     => 'user_authorization_code1',
+                                           'baseUrl'      => $this->getParameter('hydra_public_host'),
+                                           'clientId'     => 'user1@authorization.code',
                                            'clientSecret' => 'some-secret',
                                            'redirect_uri' => self::REDIRECT_URL,
                                            'scope'        => $scopes,
@@ -40,6 +40,7 @@ class TestAuthorizationCodeGrantController extends AbstractController {
 
         // If we don't have an authorization code then get one
         if (null === $code) {
+            $authorization_url = $provider->getAuthorizationUrl();
 
             // Get the state generated for you and store it to the session.
             $session->set('oauth2state', $provider->getState());
@@ -49,14 +50,14 @@ class TestAuthorizationCodeGrantController extends AbstractController {
             // (e.g. state).
             //
             // Redirect the user to the authorization URL.
-            return new RedirectResponse($provider->getAuthorizationUrl());
+            return new RedirectResponse($authorization_url);
         }
 
         // Check given state against previously stored one to mitigate CSRF attack
         if (empty($state) || ($state !== $session->get('oauth2state', null))) {
             $session->remove('oauth2state');
 
-            throw new HttpException('Invalid state', 500);
+            throw new HttpException(500, 'Invalid state');
         }
 
         try {
@@ -67,7 +68,7 @@ class TestAuthorizationCodeGrantController extends AbstractController {
             return new JsonResponse(['accessToken' => $accessToken, 'resourceOwner' => $resourceOwner]);
 
         } catch (IdentityProviderException $e) {
-            throw new HttpException($e->getMessage(), 500);
+            throw new HttpException(500, $e->getMessage());
         }
     }
 

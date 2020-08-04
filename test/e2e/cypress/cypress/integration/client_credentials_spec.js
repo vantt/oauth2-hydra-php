@@ -1,4 +1,4 @@
-describe('My First Test', () => {
+describe('Client Credential Test', () => {
     it('Does not do much!', () => {
         cy
             .request('/test-connect/client-credentials')
